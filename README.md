@@ -20,4 +20,4 @@ OpenWeatherMap: provided free API that is utilized in this application.
 
 John Young, Zac Warner: Educational Team at edX/UCB Full-Stack Bootcamp.
 
-Tala Awwad, Art Camacho: Classmates in UCB Full-Stack Bootcamp. We collaborated on setup, wireframe and conception of our dashboards.
+Tala Awwad, Art Camacho: Classmates in UCB Full-Stack Bootcamp. We collaborated on setup, wireframe and conception of our dashboards, shared javascript

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="./assets/css/style.css" />
+    <link rel="stylesheet" href="./assets/css/styles.css" />
     <link rel="icon" href="./assets/images/faviconTJW.ico" />
     <title>City Weather</title>
   </head>
@@ -11,23 +11,18 @@
     <header>
       <h1>City Weather: Current Conditions and 5-Day Forecast</h1>
     </header>
-    <aside>
-      <form>
-        <label>City Search:</label>
-        <input type="text" />
-      </form>
-    </aside>
-    <main>
-      <section id="current"></section>
-      <section id="forecast">
-        <card1></card1>
-        <card2></card2>
-        <card3></card3>
-        <card4></card4>
-        <card5></card5>
-      </section>
-    </main>
-    <script src="./assets/js/form.js"></script>
-    <script src="./assets/js/logic.js"></script>
+    <section>
+      <aside>
+        <form id="search-form">
+          <label>City Search: <input type="text" id="search-input" /></label>
+          <button type="search" id="searchButton">Search</button>
+        </form>
+      </aside>
+      <main>
+        <div></div>
+      </main>
+      <script src="./assets/js/form.js"></script>
+      <!-- <script src="./assets/js/logic.js"></script> -->
+    </section>
   </body>
 </html>
