@@ -13,9 +13,9 @@ search.addEventListener("click", function (event) {
   )
     .then((response) => response.json())
     .then((data) => {
-      const { name, lat, lon } = data[0]; //define them and passing them down
+      const { name, lat, lon } = data[0]; //defines them and passes them down
       console.log(lat, lon);
-      getWeather(name, lat, lon); //passing down to the function
+      getWeather(name, lat, lon); //passes down to the function
     })
     .catch((error) => {
       weather.innerHTML = `<p>Error: ${error}</p>`;
@@ -40,44 +40,53 @@ const renderSearchHistory = () => {
   for (city of cityHistory) {
     const button = document.createElement("button");
     button.textContent = city;
+    button.value = city;
+    button.classList.add("historyButton");
     console.log(city);
-    //TODO: add city to the button as a value, then use event.target.value to replace city in the string oni line 47 bleow.
-    //TODO: may need to add a class to these buttons for targeting, and move this button out of the function
-    button.addEventListener("click", function (event) {
-      fetch(
-        `http://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${API_key}`
-      )
-        .then((response) => response.json())
-        .then((data) => {
-          const { name, lat, lon } = data[0]; //define them and passing them down
-          console.log(lat, lon);
-          getWeather(name, lat, lon); //passing down to the function
-        })
-        .catch((error) => {
-          weather.innerHTML = `<p>Error: ${error}</p>`;
-        });
-    });
+    //TODO: add city to the button as a value, then use event.target.value to replace city in the string on line 47 below, may need to add a class to these buttons for targeting
     search_element.appendChild(button);
   }
+
+  search_element.addEventListener("click", function (e) {
+    const city = e.target.value;
+    console.log(e.target.value);
+    fetch(
+      `http://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${API_key}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        const { name, lat, lon } = data[0]; //defines them and passes them down
+        console.log(lat, lon);
+        getWeather(name, lat, lon); //passes down to the function
+      })
+      .catch((error) => {
+        weather.innerHTML = `<p>Error: ${error}</p>`;
+      });
+  });
 };
 
 const getWeather = (name, lat, lon) => {
   fetch(
     `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_key}`
   )
-    .then((response) => response.json()) //grabbing response and turing it into json
+    .then((response) => response.json()) //grabs response and turns it into json
     .then((data) => {
       const { list, city } = data;
-      const { name } = city; //grabbed city info in addition to list.
-      displayWeather(list, name); //got weather info
+      const { name } = city; //grabs city info in addition to list.
+      displayWeather(list, name); //gets weather info
     });
 };
 
 const displayWeather = (weatherData, city) => {
-  //passed weather info into here
+  current.innerHTML = "";
   weatherData.forEach((element, index) => {
     //an array. going through each item in array. element is the current item we are looking at. index is where we track it.
     if (index % 8 === 0) {
+      const weatherCard = document.createElement("div");
+      weatherCard.classList.add("col");
+      const cardBody = document.createElement("div");
+      cardBody.classList.add("card", "border-0", "bg-secondary", "text-white");
+      weatherCard.appendChild(cardBody);
       const cityName = document.createElement("h2"); //variables
       const date = document.createElement("h3");
       const conditions = document.createElement("h4");
@@ -91,12 +100,14 @@ const displayWeather = (weatherData, city) => {
       temperature.textContent = element.main.temp;
       humidity.textContent = element.main.humidity;
       windSpeed.textContent = element.wind.speed;
-      current.appendChild(cityName);
-      current.appendChild(date);
-      current.appendChild(conditions);
-      current.appendChild(temperature);
-      current.appendChild(humidity);
-      current.appendChild(windSpeed);
+
+      cardBody.appendChild(cityName);
+      cardBody.appendChild(date);
+      cardBody.appendChild(conditions);
+      cardBody.appendChild(temperature);
+      cardBody.appendChild(humidity);
+      cardBody.appendChild(windSpeed);
+      current.appendChild(weatherCard);
     }
   });
 };
