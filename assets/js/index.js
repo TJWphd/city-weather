@@ -29,13 +29,15 @@ search.addEventListener("click", function (event) {
 //   getWeather(location);
 // });
 
-function getWeather(location) {
-  const url = `https://api.openweathermap.org/data/2.5/weather?q=${location}&appid=${API_key}`;
+function getWeather(name, lat, lon) {
+  const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_key}`;
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
-      // Handle the data received from the API
-      // data;
+      // look at data.list which has 3h increments
+      // create a new list that filters for one datapoint daily (e.g. noon)
+      // display that new list instead of data on the line below this comment
+      displayWeather(data);
     })
     .catch((error) => console.error("Error fetching weather data:", error));
 }
@@ -94,41 +96,48 @@ const savedSearchHistory = (city) => {
 //     });
 // };
 
-// const displayWeather = (weatherData, city) => {
-//   current.innerHTML = "";
-//   weatherData.forEach((element, index) => {
-//     //an array. going through each item in array. element is the current item we are looking at. index is where we track it.
-//     if (index % 8 === 0) {
-//       const weatherCard = document.createElement("div");
-//       weatherCard.classList.add("col");
+const displayWeather = (weatherData) => {
+  // current.innerHTML = "";
+  console.log(weatherData);
+  weatherData.forEach((element, index) => {
+    //an array. going through each item in array. element is the current item we are looking at. index is where we track it.
+    if (index % 8 === 0) {
+      const weatherCard = document.createElement("div");
+      weatherCard.classList.add("col");
 
-//       const cardBody = document.createElement("div");
-//       cardBody.classList.add("card", "border-0", "bg-secondary", "text-white");
-//       current.appendChild(weatherCard);
+      const cardBody = document.createElement("div");
+      cardBody.classList.add("card", "border-0", "bg-secondary", "text-white");
+      current.appendChild(weatherCard);
 
-//       const cityName = document.createElement("h2");
-//       const date = document.createElement("div");
-//       const conditions = document.createElement("div");
-//       const temperature = document.createElement("div");
-//       temperature.classList.add("temperature");
-//       const humidity = document.createElement("div");
-//       const windSpeed = document.createElement("div");
+      const cityName = document.createElement("h2");
+      const date = document.createElement("div");
+      const conditions = document.createElement("div");
+      const temperature = document.createElement("div");
+      temperature.classList.add("temperature");
+      const humidity = document.createElement("div");
+      const windSpeed = document.createElement("div");
 
-//       cityName.textContent = city;
-//       date.textContent = new Date(element.dt * 1000); //converting number into a date
-//       conditions.textContent = element.weather[0].main;
-//       temperature.textContent = element.main.temp;
-//       humidity.textContent = element.main.humidity;
-//       windSpeed.textContent = element.wind.speed;
+      cityName.textContent = "Memphis";
+      date.textContent = new Date(element.dt * 1000);
+      conditions.textContent = element.weather[0].main;
+      temperature.textContent = element.main.temp;
+      humidity.textContent = element.main.humidity;
+      windSpeed.textContent = element.wind.speed;
 
-//       cardBody.appendChild(cityName);
-//       cardBody.appendChild(date);
-//       cardBody.appendChild(conditions);
-//       cardBody.appendChild(temperature);
-//       cardBody.appendChild(humidity);
-//       cardBody.appendChild(windSpeed);
-//     }
-//   });
-// };
+      cardBody.appendChild(cityName);
+      cardBody.appendChild(date);
+      cardBody.appendChild(conditions);
+      cardBody.appendChild(temperature);
+      cardBody.appendChild(humidity);
+      cardBody.appendChild(windSpeed);
+
+      weatherCard.appendChild(cardBody);
+    }
+  });
+};
+
+// displayWeather();
+// displayWeather();
+// displayWeather();
 
 // renderSearchHistory();
