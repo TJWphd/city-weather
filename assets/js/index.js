@@ -6,11 +6,18 @@ const API_key = "09e9ace5d5bf69cfa6ecf2329111b073";
 const current = document.getElementById("current");
 const search_element = document.getElementById("search-history");
 
+renderSearchHistory();
+
 search.addEventListener("click", function (event) {
   console.log(API_key);
   savedSearchHistory(locationInput.value);
+  getCoords(locationInput.value);
+  console.log(addEventListener);
+});
+
+function getCoords(city) {
   fetch(
-    `http://api.openweathermap.org/geo/1.0/direct?q=${locationInput.value}&appid=${API_key}`
+    `http://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${API_key}`
   )
     .then((response) => response.json())
     .then((data) => {
@@ -21,22 +28,13 @@ search.addEventListener("click", function (event) {
     .catch((error) => {
       weather.innerHTML = `<p>Error: ${error}</p>`;
     });
-  console.log(addEventListener);
-});
-
-// search.addEventListener("click", function () {
-//   const location = locationInput.value;
-//   getWeather(location);
-// });
+}
 
 function getWeather(name, lat, lon) {
   const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_key}`;
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
-      // look at data.list which has 3h increments
-      // create a new list that filters for one datapoint daily (e.g. noon)
-      // display that new list instead of data on the line below this comment
       displayWeather(data);
     })
     .catch((error) => console.error("Error fetching weather data:", error));
@@ -101,7 +99,7 @@ const displayWeather = (weatherData) => {
   console.log(weatherData);
 
   let isFirstDay = true;
-
+  forecast.innerHTML = "";
   weatherData.list.forEach((element, index) => {
     if (index % 8 === 0) {
       const weatherCard = document.createElement("div");
@@ -113,7 +111,9 @@ const displayWeather = (weatherData) => {
 
       const cityName = document.createElement("h2");
       const date = document.createElement("div");
-      const conditions = document.createElement("div");
+      const URL = `https://openweathermap.org/img/wn/${element.weather[0].icon}.png`;
+      const icon = document.createElement("img");
+      icon.src = URL;
       const temperature = document.createElement("div");
       temperature.classList.add("temperature");
       const humidity = document.createElement("div");
@@ -121,23 +121,22 @@ const displayWeather = (weatherData) => {
 
       cityName.textContent = weatherData.city.name;
       date.textContent = new Date(element.dt * 1000);
-      conditions.textContent = element.weather[0].main;
       temperature.textContent = element.main.temp;
       humidity.textContent = element.main.humidity;
       windSpeed.textContent = element.wind.speed;
 
       cardBody.appendChild(cityName);
       cardBody.appendChild(date);
-      cardBody.appendChild(conditions);
+      cardBody.appendChild(icon);
       cardBody.appendChild(temperature);
       cardBody.appendChild(humidity);
       cardBody.appendChild(windSpeed);
-
       weatherCard.appendChild(cardBody);
 
       if (isFirstDay) {
         const currentWeatherCard = weatherCard;
         console.log("123");
+        current.innerHTML = "";
         current.appendChild(currentWeatherCard);
         isFirstDay = false;
       }
@@ -145,4 +144,15 @@ const displayWeather = (weatherData) => {
   });
 };
 
-// renderSearchHistory();
+function renderSearchHistory() {
+  const history = JSON.parse(localStorage.getItem("cities"));
+  for (let i = 0; i < 10; i++) {
+    let city = history[i];
+    const searchHistory = document.createElement("button");
+    searchHistory.addEventListener("click", (event) => {
+      getCoords(event.target.innerText);
+    });
+    searchHistory.innerText = city;
+    document.getElementById("search-history").appendChild(searchHistory);
+  }
+}

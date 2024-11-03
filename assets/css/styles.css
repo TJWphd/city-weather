@@ -3,14 +3,15 @@ body {
   background-color: #7fa5cb;
 }
 
-h1 h2 h3 h4 h5 h6 {
-  margin: 0 auto;
-  max-width: 800px;
-  padding: 30px 40px;
+#main-section {
+  background-color: rgb(196, 196, 33);
+  display: flex;
+  flex-wrap: wrap;
 }
 
-section {
-  background-color: rgb(196, 196, 33);
+#search-history {
+  display: flex;
+  flex-direction: column;
 }
 
 aside {
@@ -26,23 +27,26 @@ aside {
 }
 
 #search-form {
-  font-size: 24px;
+  font-weight: bold;
 }
 
 #input {
-  font-size: 24px;
+  font-weight: bold;
 }
 
 button {
-  font-size: 24px;
+  font-weight: bold;
 }
 
 #search-button {
   font-weight: bold;
 }
 
+#forecast {
+  display: flex;
+}
+
 .col {
-  color: cadetblue;
 }
 
 #current {
