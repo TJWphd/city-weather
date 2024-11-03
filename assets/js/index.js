@@ -99,15 +99,17 @@ const savedSearchHistory = (city) => {
 const displayWeather = (weatherData) => {
   // current.innerHTML = "";
   console.log(weatherData);
-  weatherData.forEach((element, index) => {
-    //an array. going through each item in array. element is the current item we are looking at. index is where we track it.
+
+  let isFirstDay = true;
+
+  weatherData.list.forEach((element, index) => {
     if (index % 8 === 0) {
       const weatherCard = document.createElement("div");
       weatherCard.classList.add("col");
-
       const cardBody = document.createElement("div");
       cardBody.classList.add("card", "border-0", "bg-secondary", "text-white");
-      current.appendChild(weatherCard);
+
+      forecast.appendChild(weatherCard);
 
       const cityName = document.createElement("h2");
       const date = document.createElement("div");
@@ -117,7 +119,7 @@ const displayWeather = (weatherData) => {
       const humidity = document.createElement("div");
       const windSpeed = document.createElement("div");
 
-      cityName.textContent = "Memphis";
+      cityName.textContent = weatherData.city.name;
       date.textContent = new Date(element.dt * 1000);
       conditions.textContent = element.weather[0].main;
       temperature.textContent = element.main.temp;
@@ -132,12 +134,15 @@ const displayWeather = (weatherData) => {
       cardBody.appendChild(windSpeed);
 
       weatherCard.appendChild(cardBody);
+
+      if (isFirstDay) {
+        const currentWeatherCard = weatherCard;
+        console.log("123");
+        current.appendChild(currentWeatherCard);
+        isFirstDay = false;
+      }
     }
   });
 };
-
-// displayWeather();
-// displayWeather();
-// displayWeather();
 
 // renderSearchHistory();
