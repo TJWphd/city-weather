@@ -6,13 +6,10 @@ const API_key = "09e9ace5d5bf69cfa6ecf2329111b073";
 const current = document.getElementById("current");
 const search_element = document.getElementById("search-history");
 
-renderSearchHistory();
-
 search.addEventListener("click", function (event) {
   console.log(API_key);
   savedSearchHistory(locationInput.value);
   getCoords(locationInput.value);
-  console.log(addEventListener);
 });
 
 function getCoords(city) {
@@ -31,7 +28,7 @@ function getCoords(city) {
 }
 
 function getWeather(name, lat, lon) {
-  const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_key}`;
+  const url = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_key}`;
   fetch(url)
     .then((response) => response.json())
     .then((data) => {
@@ -49,53 +46,8 @@ const savedSearchHistory = (city) => {
   localStorage.setItem("cities", JSON.stringify(cityHistory));
 };
 
-// const renderSearchHistory = () => {
-//   let cityHistory = JSON.parse(localStorage.getItem("cities"));
-//   if (!cityHistory) {
-//     return;
-//   }
-//   console.log(cityHistory);
-//   for (city of cityHistory) {
-//     const button = document.createElement("button");
-//     button.textContent = city;
-//     button.value = city;
-//     button.classList.add("historyButton");
-//     //TODO: add city to the button as a value, then use event.target.value to replace city in the string on line 47 below, may need to add a class to these buttons for targeting
-//     search_element.appendChild(button);
-//   }
-
-//   search_element.addEventListener("click", function (e) {
-//     const city = e.target.value;
-//     console.log(e.target.value);
-//     fetch(
-//       `http://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${API_key}`
-//     )
-//       .then((response) => response.json())
-//       .then((data) => {
-//         const { name, lat, lon } = data[0]; //defines them and passes them down
-//         console.log(lat, lon);
-//         getWeather(name, lat, lon); //passes down to the function
-//       })
-//       .catch((error) => {
-//         weather.innerHTML = `<p>Error: ${error}</p>`;
-//       });
-//   });
-// };
-
-// const getWeather = (name, lat, lon) => {
-//   fetch(
-//     `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_key}`
-//   )
-//     .then((response) => response.json()) //grabs response and turns it into json
-//     .then((data) => {
-//       const { list, city } = data;
-//       const { name } = city; //grabs city info in addition to list.
-//       displayWeather(list, name); //gets weather info
-//     });
-// };
-
 const displayWeather = (weatherData) => {
-  // current.innerHTML = "";
+  current.innerHTML = "";
   console.log(weatherData);
 
   let isFirstDay = true;
@@ -111,10 +63,17 @@ const displayWeather = (weatherData) => {
 
       const cityName = document.createElement("h2");
       const date = document.createElement("div");
-      const URL = `https://openweathermap.org/img/wn/${element.weather[0].icon}.png`;
+      const URL = `http://openweathermap.org/img/wn/${element.weather[0].icon}.png`;
       const icon = document.createElement("img");
       icon.src = URL;
-      const temperature = document.createElement("div");
+      const tempKelvin = element.main.temp;
+      const tempCelsius = tempKelvin - 273.15;
+      const temperature = document.createElement("div"); // Create the temperature element
+      temperature.textContent = tempCelsius.toFixed(2); // Display temperature with 2 decimal places
+      temperature.classList.add("temperature");
+      cardBody.appendChild(temperature); // Append the temperature element
+
+      temperature.textContent = tempCelsius.toFixed(2); // displays with 2 decimal places
       temperature.classList.add("temperature");
       const humidity = document.createElement("div");
       const windSpeed = document.createElement("div");
@@ -128,7 +87,7 @@ const displayWeather = (weatherData) => {
       cardBody.appendChild(cityName);
       cardBody.appendChild(date);
       cardBody.appendChild(icon);
-      cardBody.appendChild(temperature);
+      cardBody.appendChild(tempCelsius);
       cardBody.appendChild(humidity);
       cardBody.appendChild(windSpeed);
       weatherCard.appendChild(cardBody);
@@ -146,13 +105,21 @@ const displayWeather = (weatherData) => {
 
 function renderSearchHistory() {
   const history = JSON.parse(localStorage.getItem("cities"));
-  for (let i = 0; i < 10; i++) {
-    let city = history[i];
-    const searchHistory = document.createElement("button");
-    searchHistory.addEventListener("click", (event) => {
-      getCoords(event.target.innerText);
+  const searchHistoryContainer = document.getElementById("search-history");
+  searchHistoryContainer.innerHTML = ""; //clears previous history
+
+  if (history && history.length > 0) {
+    history.forEach((city) => {
+      const searchHistory = document.createElement("button");
+      searchHistory.addEventListener("click", () => {
+        getCoords(city);
+      });
+      searchHistory.innerText = city;
+      searchHistoryContainer.appendChild(searchHistory);
     });
-    searchHistory.innerText = city;
-    document.getElementById("search-history").appendChild(searchHistory);
+  } else {
+    const noHistoryMessage = document.createElement("div");
+    noHistoryMessage.innerText = "No search history available";
+    searchHistoryContainer.appendChild(noHistoryMessage);
   }
 }
