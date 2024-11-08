@@ -2,7 +2,7 @@ const locationInput = document.getElementById("input");
 const search = document.getElementById("searchButton");
 const weather = document.getElementById("weather");
 const forecast = document.getElementById("forecast");
-const API_key = "09e9ace5d5bf69cfa6ecf2329111b073";
+// const API_key = "09e9ace5d5bf69cfa6ecf2329111b073";
 const current = document.getElementById("current");
 const search_element = document.getElementById("search-history");
 
