@@ -1,9 +1,11 @@
 const locationInput = document.getElementById("input");
 const search = document.getElementById("searchButton");
+const cityNameEl = document.getElementById("cityName");
 const weather = document.getElementById("weather");
-const forecast = document.getElementById("forecast");
-// const API_key = "09e9ace5d5bf69cfa6ecf2329111b073";
 const current = document.getElementById("current");
+const forecast = document.getElementById("forecast");
+const API_key = "09e9ace5d5bf69cfa6ecf2329111b073";
+
 const search_element = document.getElementById("search-history");
 
 search.addEventListener("click", function (event) {
@@ -12,46 +14,42 @@ search.addEventListener("click", function (event) {
   getCoords(locationInput.value);
 });
 
-function getCoords(city) {
-  fetch(
-    `http://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${API_key}`
-  )
-    .then((response) => response.json())
-    .then((data) => {
-      const { name, lat, lon } = data[0];
-      console.log(lat, lon);
-      getWeather(name, lat, lon);
-    })
-    .catch((error) => {
-      weather.innerHTML = `<p>Error: ${error}</p>`;
-    });
-}
-
-function getWeather(name, lat, lon) {
-  const url = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_key}`;
-  fetch(url)
-    .then((response) => response.json())
-    .then((data) => {
-      displayWeather(data);
-    })
-    .catch((error) => console.error("Error fetching weather data:", error));
-}
-
-const savedSearchHistory = (city) => {
-  let cityHistory = JSON.parse(localStorage.getItem("cities"));
-  if (!cityHistory) {
-    cityHistory = [];
+// turns city entry into latitude/longitude coordinates for API
+async function getCoords(city) {
+  try {
+    const response = await fetch(
+      `http://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${API_key}`
+    );
+    const data = await response.json();
+    const { name, lat, lon } = data[0];
+    getWeather(name, lat, lon);
+    cityNameEl.textContent = city;
+  } catch (error) {
+    weather.innerHTML = `<p>Error: ${error}</p>`;
   }
-  cityHistory.push(city);
-  localStorage.setItem("cities", JSON.stringify(cityHistory));
-};
+}
 
+// enters coords into API to return weather forecast
+async function getWeather(name, lat, lon) {
+  const url = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_key}`;
+  try {
+    const response = await fetch(url);
+    const data = await response.json();
+    displayWeather(data);
+  } catch (error) {
+    console.error("Error fetching weather data:", error);
+  }
+}
+
+// creates HTML elements and displays weather in them
 const displayWeather = (weatherData) => {
   current.innerHTML = "";
-  console.log(weatherData);
-
   let isFirstDay = true;
   forecast.innerHTML = "";
+  const cityName = document.createElement("h2");
+  cityName.textContent = weatherData.cityName;
+  current.appendChild(cityName);
+
   weatherData.list.forEach((element, index) => {
     if (index % 8 === 0) {
       const weatherCard = document.createElement("div");
@@ -59,67 +57,87 @@ const displayWeather = (weatherData) => {
       const cardBody = document.createElement("div");
       cardBody.classList.add("card", "border-0", "bg-secondary", "text-white");
 
-      forecast.appendChild(weatherCard);
-
       const cityName = document.createElement("h2");
+      cityName.textContent = weatherData.cityName;
       const date = document.createElement("div");
-      const URL = `http://openweathermap.org/img/wn/${element.weather[0].icon}.png`;
-      const icon = document.createElement("img");
-      icon.src = URL;
-      const tempKelvin = element.main.temp;
-      const tempCelsius = tempKelvin - 273.15;
-      const temperature = document.createElement("div"); // Create the temperature element
-      temperature.textContent = tempCelsius.toFixed(2); // Display temperature with 2 decimal places
-      temperature.classList.add("temperature");
-      cardBody.appendChild(temperature); // Append the temperature element
+      date.textContent = new Date(element.dt * 1000).toLocaleDateString();
 
-      temperature.textContent = tempCelsius.toFixed(2); // displays with 2 decimal places
+      const iconURL = `http://openweathermap.org/img/wn/${element.weather[0].icon}.png`;
+      const icon = document.createElement("img");
+      icon.setAttribute("src", iconURL);
+      icon.setAttribute("alt", element.weather[0].description);
+      const tempKelvin = element.main.temp;
+      const tempFahrenheit = ((tempKelvin - 273.15) * 9) / 5 + 32;
+
+      const temperature = document.createElement("div"); // Create the temperature element
+      temperature.textContent = `${tempFahrenheit.toFixed(1)}°F`; // show 1 decimal place
       temperature.classList.add("temperature");
       const humidity = document.createElement("div");
+      humidity.textContent = `Humidity: ${element.main.humidity}%`;
       const windSpeed = document.createElement("div");
+      windSpeed.textContent = `Wind: ${element.wind.speed} m/s`;
 
-      cityName.textContent = weatherData.city.name;
-      date.textContent = new Date(element.dt * 1000);
-      temperature.textContent = element.main.temp;
-      humidity.textContent = element.main.humidity;
-      windSpeed.textContent = element.wind.speed;
-
-      cardBody.appendChild(cityName);
+      // appends elements to card body
       cardBody.appendChild(date);
       cardBody.appendChild(icon);
-      cardBody.appendChild(tempCelsius);
+      cardBody.appendChild(temperature);
       cardBody.appendChild(humidity);
       cardBody.appendChild(windSpeed);
+
+      // appends card body to card
       weatherCard.appendChild(cardBody);
 
+      // displays current day's weather in Current Zone container
       if (isFirstDay) {
-        const currentWeatherCard = weatherCard;
-        console.log("123");
-        current.innerHTML = "";
-        current.appendChild(currentWeatherCard);
+        current.appendChild(cardBody);
         isFirstDay = false;
+      } else {
+        forecast.appendChild(weatherCard);
       }
     }
   });
 };
 
-function renderSearchHistory() {
-  const history = JSON.parse(localStorage.getItem("cities"));
-  const searchHistoryContainer = document.getElementById("search-history");
-  searchHistoryContainer.innerHTML = ""; //clears previous history
+// saves search history to local storage
+const savedSearchHistory = (city) => {
+  let cityHistory = JSON.parse(localStorage.getItem("cities")) || [];
+  cityHistory.push(city);
+  localStorage.setItem("cities", JSON.stringify(cityHistory));
+};
 
-  if (history && history.length > 0) {
+// renders search history from local storage
+function renderSearchHistory() {
+  const history = JSON.parse(localStorage.getItem("cities")) || [];
+  const searchHistoryContainer = document.getElementById("search-history");
+  searchHistoryContainer.innerHTML = "";
+
+  if (history.length > 0) {
     history.forEach((city) => {
-      const searchHistory = document.createElement("button");
-      searchHistory.addEventListener("click", () => {
+      const searchHistoryButton = document.createElement("button");
+      searchHistoryButton.textContent = city;
+      searchHistoryButton.addEventListener("click", () => {
         getCoords(city);
       });
-      searchHistory.innerText = city;
-      searchHistoryContainer.appendChild(searchHistory);
+      searchHistoryContainer.appendChild(searchHistoryButton);
     });
   } else {
     const noHistoryMessage = document.createElement("div");
-    noHistoryMessage.innerText = "No search history available";
+    noHistoryMessage.textContent = "No search history available";
     searchHistoryContainer.appendChild(noHistoryMessage);
   }
 }
+
+// Event listener for search button click
+search.addEventListener("click", (event) => {
+  event.preventDefault(); // Prevent form submission
+  const city = locationInput.value.trim();
+  if (city) {
+    savedSearchHistory(city);
+    getCoords(city);
+    renderSearchHistory();
+    locationInput.value = ""; // Clears input field
+  }
+});
+
+// Renders search history on page load
+renderSearchHistory();
