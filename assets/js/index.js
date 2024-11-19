@@ -8,10 +8,16 @@ const API_key = "09e9ace5d5bf69cfa6ecf2329111b073";
 
 const search_element = document.getElementById("search-history");
 
-search.addEventListener("click", function (event) {
-  console.log(API_key);
-  savedSearchHistory(locationInput.value);
-  getCoords(locationInput.value);
+// Event listener for search button click
+search.addEventListener("click", (event) => {
+  event.preventDefault(); // Prevent form submission
+  const city = locationInput.value.trim();
+  if (city) {
+    savedSearchHistory(city);
+    getCoords(city);
+    renderSearchHistory();
+    locationInput.value = ""; // Clears input field
+  }
 });
 
 // turns city entry into latitude/longitude coordinates for API
@@ -126,18 +132,6 @@ function renderSearchHistory() {
     searchHistoryContainer.appendChild(noHistoryMessage);
   }
 }
-
-// Event listener for search button click
-search.addEventListener("click", (event) => {
-  event.preventDefault(); // Prevent form submission
-  const city = locationInput.value.trim();
-  if (city) {
-    savedSearchHistory(city);
-    getCoords(city);
-    renderSearchHistory();
-    locationInput.value = ""; // Clears input field
-  }
-});
 
 // Renders search history on page load
 renderSearchHistory();
