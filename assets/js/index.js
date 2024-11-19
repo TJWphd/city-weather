@@ -18,7 +18,7 @@ search.addEventListener("click", function (event) {
 async function getCoords(city) {
   try {
     const response = await fetch(
-      `http://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${API_key}`
+      `https://api.openweathermap.org/geo/1.0/direct?q=${city}&appid=${API_key}`
     );
     const data = await response.json();
     const { name, lat, lon } = data[0];
@@ -31,7 +31,7 @@ async function getCoords(city) {
 
 // enters coords into API to return weather forecast
 async function getWeather(name, lat, lon) {
-  const url = `http://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_key}`;
+  const url = `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&appid=${API_key}`;
   try {
     const response = await fetch(url);
     const data = await response.json();
@@ -62,7 +62,7 @@ const displayWeather = (weatherData) => {
       const date = document.createElement("div");
       date.textContent = new Date(element.dt * 1000).toLocaleDateString();
 
-      const iconURL = `http://openweathermap.org/img/wn/${element.weather[0].icon}.png`;
+      const iconURL = `https://openweathermap.org/img/wn/${element.weather[0].icon}.png`;
       const icon = document.createElement("img");
       icon.setAttribute("src", iconURL);
       icon.setAttribute("alt", element.weather[0].description);
